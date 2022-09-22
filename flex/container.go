@@ -4,9 +4,12 @@ import (
 	"math"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/shashanktomar/sprinkles/utils"
 )
 
-type Direction int8
+type (
+	Direction int8
+)
 
 const (
 	Row Direction = iota
@@ -16,43 +19,39 @@ const (
 type Container struct {
 	direction Direction
 
-	width  int
-	height int
+	mainSize  int
+	crossSize int
 
-	boxes []*boxWrapper
+	boxes []*boxWithStyle
 }
 
-// TODO: Rename this
-type boxWrapper struct {
-	box    Box
-	config boxConfig
+type boxWithStyle struct {
+	box   Box
+	style *BoxStyle
 }
 
 func NewContainer(direction Direction) *Container {
 	return &Container{
 		direction: direction,
+		boxes:     make([]*boxWithStyle, 0),
 	}
 }
 
 func (c *Container) SetSize(width int, height int) {
-	c.width = width
-	if c.width < 0 {
-		c.width = 0
+	if c.direction == Row {
+		c.mainSize = width
+		c.crossSize = height
+	} else {
+		c.mainSize = height
+		c.crossSize = width
 	}
-
-	c.height = height
-	if c.height < 0 {
-		c.height = 0
-	}
-
 	c.calculateBoxes()
 }
 
-func (c *Container) AddBox(box Box, config boxConfig) *Container {
-	// TODO: validate config
-	c.boxes = append(c.boxes, &boxWrapper{
-		box:    box,
-		config: config,
+func (c *Container) AddBox(box Box, style *BoxStyle) *Container {
+	c.boxes = append(c.boxes, &boxWithStyle{
+		box:   box,
+		style: style,
 	})
 	return c
 }
@@ -71,19 +70,40 @@ func (c *Container) View() string {
 }
 
 func (c *Container) calculateBoxes() {
-	totalRatio := 0
+	totalGrow := 0.0
+	totalShrink := 0.0
+	totalSizeToAdjust := c.mainSize
 	for _, b := range c.boxes {
-		totalRatio += b.config.ratio
+		totalGrow += b.style.grow
+		totalShrink += b.style.shrink
+
+		// adjust box size if it is outside min-max range
+		b.style.basis = utils.Limit(b.style.minSize, b.style.maxSize, b.style.basis)
+
+		totalSizeToAdjust -= b.style.basis
 	}
 
-	for _, b := range c.boxes {
-		sizeFraction := float64(b.config.ratio) / float64(totalRatio)
-		if c.direction == Row {
-			width := int(math.Floor(sizeFraction * float64(c.width)))
-			b.box.SetSize(width, c.height)
+	totalAllocatedSize := 0
+	for i, b := range c.boxes {
+		flex := 0.0
+		if totalSizeToAdjust > 0 {
+			flex = b.style.grow / totalGrow
 		} else {
-			height := int(math.Floor(sizeFraction * float64(c.height)))
-			b.box.SetSize(c.width, height)
+			flex = b.style.shrink / totalShrink
+		}
+		sizeToAdjust := int(math.Floor(flex * float64(totalSizeToAdjust)))
+		updatedSize := b.style.basis + sizeToAdjust
+		totalAllocatedSize += updatedSize
+
+		// if we missed few pixels because of fractions, allocate it to last box
+		if i == len(c.boxes)-1 && c.mainSize != totalAllocatedSize {
+			updatedSize += c.mainSize - totalAllocatedSize
+		}
+
+		if c.direction == Row {
+			b.box.SetSize(updatedSize, c.crossSize)
+		} else {
+			b.box.SetSize(c.crossSize, updatedSize)
 		}
 	}
 }

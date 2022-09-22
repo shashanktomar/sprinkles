@@ -18,9 +18,9 @@ func New() Bubble {
 	boxThree := examples.NewBox()
 
 	layout := flex.NewContainer(flex.Row).
-		AddBox(boxOne, flex.NewStyle().Flex(1)).
-		AddBox(boxTwo, flex.NewStyle().Flex(2)).
-		AddBox(boxThree, flex.NewStyle().Flex(4))
+		AddBox(boxOne, flex.NewStyle().FlexAuto(999)).
+		AddBox(boxTwo, flex.NewStyle().FlexAuto(999+40)).
+		AddBox(boxThree, flex.NewStyle().FlexAuto(999))
 
 	return Bubble{
 		layout: layout,

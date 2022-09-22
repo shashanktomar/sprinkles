@@ -4,46 +4,23 @@ import (
 	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/shashanktomar/sprinkles/examples"
 	"github.com/shashanktomar/sprinkles/flex"
 )
-
-var boxStyle = lipgloss.NewStyle().Border(lipgloss.NormalBorder())
-
-// View you want to render in the box
-type MyView struct {
-	text   string
-	width  int
-	height int
-	style  lipgloss.Style
-}
-
-// Your view need to implement flex.Box interface
-func (b *MyView) SetSize(width int, height int) {
-	b.width = width
-	b.height = height
-}
-
-// Your view need to implement flex.Box interface
-func (b *MyView) View() string {
-	w, h := b.style.GetFrameSize()
-	text := lipgloss.Place(b.width-w, b.height-h, lipgloss.Center, lipgloss.Center, b.text)
-	return b.style.Render(text)
-}
 
 type Bubble struct {
 	layout *flex.Container
 }
 
 func New() Bubble {
-	boxOne := &MyView{text: "box-one", style: boxStyle}
-	boxTwo := &MyView{text: "box-two", style: boxStyle}
-	boxThree := &MyView{text: "box-three", style: boxStyle}
+	boxOne := examples.NewBox()
+	boxTwo := examples.NewBox()
+	boxThree := examples.NewBox()
 
 	layout := flex.NewContainer(flex.Column).
-		AddBox(boxOne, flex.NewBoxStyle(1)).
-		AddBox(boxTwo, flex.NewBoxStyle(3)).
-		AddBox(boxThree, flex.NewBoxStyle(1))
+		AddBox(boxOne, flex.NewStyle().Flex(1)).
+		AddBox(boxTwo, flex.NewStyle().Flex(3)).
+		AddBox(boxThree, flex.NewStyle().Flex(1))
 
 	return Bubble{
 		layout: layout,

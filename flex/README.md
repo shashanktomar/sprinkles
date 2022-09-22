@@ -17,17 +17,18 @@ Box
 
 Container
 
-- [x] add direction property
+- [x] add row and column direction properties
 - [ ] add flex-wrap property
 - [ ] add justify-content property
 - [ ] add align-items property
 - [ ] add align-content property
 - [ ] add gap, row-gap and column-gap properties
+- [ ] add row-reverse and column-reverse properties
 
 Box
 
-- [x] add flex ratio property
+- [x] add flex grow property
+- [x] add flex shrink property
+- [x] add flex basis property
 - [ ] add order property
-- [ ] add flex shrink property
-- [ ] add flex basis property
-- [ ] add align self property
+- [ ] add alignment property
