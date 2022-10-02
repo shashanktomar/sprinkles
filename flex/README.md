@@ -1,17 +1,45 @@
 # Flex
 
-Check [a guide to flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) to understand the details.
+TODO GIF
 
-## Properties
+Check [a guide to flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
+to understand the details.
 
-Container
+Currently support:
 
-- `direction`: either `row` or `column`. The direction of the flex container. See examples for more details
+- row and column directions on a container
+- `grow`, `shrink` and `basis` properties on a box
+- `minsize` and `maxsize` on a box
 
-Box
+## Examples
 
-- `ratio`: a positive number. The ratio of the box within the container, relative to other boxes.
-  If there are three boxes with ratio 1, 1, 3. The first two boxes will have same size and the third one will be 3 times the size.
+You can run examples under `./examples` like `cd ./examples/flex-row/ && go run .`
+
+## Tutorial
+
+Create a container and add boxes:
+
+```go
+layout := flex.NewContainer(flex.Row).
+  AddBox(boxOne, flex.NewStyle().Flex(1)).
+  AddBox(boxTwo, flex.NewStyle().Flex(2)).
+  AddBox(boxThree, flex.NewStyle().Flex(4))
+```
+
+Here a box need to implement:
+
+```go
+type Box interface {
+ SetSize(int, int)
+ View() string
+}
+```
+
+### Grow in row direction
+
+### Grow in column direction
+
+### Composed in both directions
 
 ## Potential Roadmap
 

@@ -48,14 +48,16 @@ func (b *MyView) generateText(width int, height int) string {
 	var sb strings.Builder
 	sb.WriteString(extendedText)
 	sb.WriteString(strings.Repeat("#", (b.basis-2)/2))
-	text := lipgloss.NewStyle().
+	sizeText := lipgloss.NewStyle().
 		Foreground(highlight).
 		Render(fmt.Sprint(b.basis))
-	sb.WriteString(text)
+	sb.WriteString(sizeText)
 	sb.WriteString(strings.Repeat("#", (b.basis-2)/2))
 	sb.WriteString(extendedText)
 
-	return lipgloss.Place(width, height, lipgloss.Center, lipgloss.Center, sb.String())
+	text := lipgloss.NewStyle().MaxWidth(width).Render(sb.String())
+
+	return lipgloss.Place(width, height, lipgloss.Center, lipgloss.Center, text)
 }
 
 type Bubble struct {

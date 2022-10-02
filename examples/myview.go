@@ -31,6 +31,9 @@ func (b *Box) SetSize(width int, height int) {
 
 // Your view need to implement flex.Box interface
 func (b *Box) View() string {
+	if b.width == 0 || b.height == 0 {
+		return ""
+	}
 	w, h := b.style.GetFrameSize()
 	display := fmt.Sprintf("%d%s%d", b.width, subtle.Render("x"), b.height)
 	text := lipgloss.Place(b.width-w, b.height-h, lipgloss.Center, lipgloss.Center, display)

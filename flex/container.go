@@ -45,7 +45,7 @@ func (c *Container) SetSize(width int, height int) {
 		c.mainSize = height
 		c.crossSize = width
 	}
-	c.calculateBoxes()
+	c.calculate()
 }
 
 func (c *Container) AddBox(box Box, style *BoxStyle) *Container {
@@ -69,41 +69,48 @@ func (c *Container) View() string {
 	}
 }
 
-func (c *Container) calculateBoxes() {
-	totalGrow := 0.0
-	totalShrink := 0.0
+func (c *Container) calculate() {
 	totalSizeToAdjust := c.mainSize
 	for _, b := range c.boxes {
-		totalGrow += b.style.grow
-		totalShrink += b.style.shrink
-
-		// adjust box size if it is outside min-max range
-		b.style.basis = utils.Limit(b.style.minSize, b.style.maxSize, b.style.basis)
-
+		b.style.limitSize()
 		totalSizeToAdjust -= b.style.basis
 	}
 
 	totalAllocatedSize := 0
 	for i, b := range c.boxes {
-		flex := 0.0
+		remainingBoxes := boxStyles(c.boxes[i:])
+		growRatio, shrinkRatio := b.style.calculateFlexRatios(remainingBoxes)
+		ratio := 0.0
 		if totalSizeToAdjust > 0 {
-			flex = b.style.grow / totalGrow
+			ratio = growRatio
 		} else {
-			flex = b.style.shrink / totalShrink
+			ratio = shrinkRatio
 		}
-		sizeToAdjust := int(math.Floor(flex * float64(totalSizeToAdjust)))
-		updatedSize := b.style.basis + sizeToAdjust
-		totalAllocatedSize += updatedSize
+		sizeToAdjust := int(math.Floor(ratio * float64(totalSizeToAdjust)))
+		limitedSizeToAdjust := b.style.limitSizeChange(sizeToAdjust)
+		totalSizeToAdjust -= limitedSizeToAdjust
 
-		// if we missed few pixels because of fractions, allocate it to last box
+		newSize := utils.Limit(b.style.minSize, b.style.maxSize, b.style.basis+limitedSizeToAdjust)
+		totalAllocatedSize += newSize
+
+		// If we missed few pixels because of fractions, allocate it to last box.
 		if i == len(c.boxes)-1 && c.mainSize != totalAllocatedSize {
-			updatedSize += c.mainSize - totalAllocatedSize
+			newSize += c.mainSize - totalAllocatedSize
+			newSize = utils.Limit(b.style.minSize, b.style.maxSize, newSize)
 		}
 
 		if c.direction == Row {
-			b.box.SetSize(updatedSize, c.crossSize)
+			b.box.SetSize(newSize, c.crossSize)
 		} else {
-			b.box.SetSize(c.crossSize, updatedSize)
+			b.box.SetSize(c.crossSize, newSize)
 		}
 	}
+}
+
+func boxStyles(boxes []*boxWithStyle) []*BoxStyle {
+	result := make([]*BoxStyle, len(boxes))
+	for i, b := range boxes {
+		result[i] = b.style
+	}
+	return result
 }
