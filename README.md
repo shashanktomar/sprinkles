@@ -3,7 +3,7 @@
 Some components for [bubbletea](https://github.com/charmbracelet/bubbletea)
 applications. Have a look at the examples.
 
-## Flex
+## Flex View
 
 ![master-gif](https://user-images.githubusercontent.com/2309241/193480567-ec905b89-7c87-4a55-b6bb-cca2ad1c8969.gif)
 
@@ -14,4 +14,4 @@ bubbletea application which support:
 - `grow`, `shrink` and `basis` properties on a box
 - `minsize` and `maxsize` on a box
 
-Check [flex readme](./flex/README.md) for more details
+Check [flex readme](./flex/README.md) for more documentation.

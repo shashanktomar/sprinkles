@@ -1,6 +1,6 @@
 # Flex
 
-TODO GIF
+![master-gif](https://user-images.githubusercontent.com/2309241/193480567-ec905b89-7c87-4a55-b6bb-cca2ad1c8969.gif)
 
 Check [a guide to flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
 to understand the details.
@@ -35,17 +35,12 @@ type Box interface {
 }
 ```
 
-### Grow in row direction
-
-### Grow in column direction
-
-### Composed in both directions
-
 ## Potential Roadmap
 
 Container
 
 - [x] add row and column direction properties
+- [ ] support style on container
 - [ ] add flex-wrap property
 - [ ] add justify-content property
 - [ ] add align-items property
