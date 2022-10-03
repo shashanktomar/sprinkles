@@ -7,6 +7,7 @@ import (
 	"github.com/shashanktomar/sprinkles/utils"
 )
 
+// Direction is the direction in which flex behaviour is applied
 type (
 	Direction int8
 )
@@ -16,6 +17,8 @@ const (
 	Column
 )
 
+// Container holds the boxes and calculate their size when SetSize
+// is called. The size is influenced by BoxStyle assigned to a Box
 type Container struct {
 	direction Direction
 
@@ -30,6 +33,9 @@ type boxWithStyle struct {
 	style *BoxStyle
 }
 
+// NewContainer create a new container with a given Direction.
+// Direction can row or column. This influence in what direction
+// the flex behaviour will work.
 func NewContainer(direction Direction) *Container {
 	return &Container{
 		direction: direction,
@@ -37,6 +43,9 @@ func NewContainer(direction Direction) *Container {
 	}
 }
 
+// SetSize set the size of the container. This should be invoked
+// on every size update, for example when you receive tea.WindowSizeMsg.
+// Calling this method triggers the flex calculation on all child boxes.
 func (c *Container) SetSize(width int, height int) {
 	if c.direction == Row {
 		c.mainSize = width
@@ -48,6 +57,8 @@ func (c *Container) SetSize(width int, height int) {
 	c.calculate()
 }
 
+// AddBox adds a box to the container. Pass BoxStyle to set flex properties
+// on the box.
 func (c *Container) AddBox(box Box, style *BoxStyle) *Container {
 	c.boxes = append(c.boxes, &boxWithStyle{
 		box:   box,
@@ -56,6 +67,8 @@ func (c *Container) AddBox(box Box, style *BoxStyle) *Container {
 	return c
 }
 
+// View returns the rendered boxes. Use this in your View method to get the
+// the styled string.
 func (c *Container) View() string {
 	text := make([]string, len(c.boxes))
 	for i, b := range c.boxes {
